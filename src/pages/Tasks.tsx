@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import CreateTaskModal from "../components/CreateTaskModal";
 import {
   PlusIcon,
   FilterIcon,
@@ -7,67 +8,34 @@ import {
   ClockIcon,
 } from "lucide-react";
 const Tasks = () => {
+  type Task = {
+    id: number;
+    title: string;
+    description: string;
+    priority: string;
+    due_date: string;
+    status: string;
+    assignee: string;
+  };
+
   const [filter, setFilter] = useState("all");
-  const tasks = [
-    {
-      id: 1,
-      title: "Patrol Schedule Review",
-      description:
-        "Review and approve the weekly patrol schedule for downtown area",
-      priority: "High",
-      dueDate: "2023-05-15",
-      status: "In Progress",
-      assignee: "Officer Dlamini",
-    },
-    {
-      id: 2,
-      title: "Equipment Inventory",
-      description:
-        "Complete monthly inventory check of all department equipment",
-      priority: "Medium",
-      dueDate: "2023-05-18",
-      status: "Pending",
-      assignee: "Lt. Bhembe",
-    },
-    {
-      id: 3,
-      title: "Training Evaluation",
-      description:
-        "Evaluate results from last week's firearms training session",
-      priority: "High",
-      dueDate: "2023-05-12",
-      status: "Completed",
-      assignee: "Sgt. Dlakudze",
-    },
-    {
-      id: 4,
-      title: "Community Outreach Plan",
-      description:
-        "Develop plan for upcoming community outreach event at Central Park",
-      priority: "Low",
-      dueDate: "2023-05-25",
-      status: "Not Started",
-      assignee: "Officer Nxumalo",
-    },
-    {
-      id: 5,
-      title: "Vehicle Maintenance Schedule",
-      description: "Update maintenance schedule for all department vehicles",
-      priority: "Medium",
-      dueDate: "2023-05-20",
-      status: "In Progress",
-      assignee: "Officer Dlakuze",
-    },
-    {
-      id: 6,
-      title: "Budget Report Preparation",
-      description: "Prepare quarterly budget report for city council meeting",
-      priority: "High",
-      dueDate: "2023-05-10",
-      status: "Pending",
-      assignee: "Chief Dlamini",
-    },
-  ];
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/tasks/");
+      const data = await response.json();
+      setTasks(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   const filteredTasks =
     filter === "all"
       ? tasks
@@ -109,10 +77,17 @@ const Tasks = () => {
             Assign and track department tasks
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700"
+          onClick={() => setIsModalOpen(true)}
+        >
           <PlusIcon size={18} className="mr-1" />
           Create Task
         </button>
+        <CreateTaskModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </div>
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
@@ -195,7 +170,7 @@ const Tasks = () => {
                     </span>
                     <span className="text-xs text-gray-500 flex items-center">
                       <ClockIcon size={14} className="mr-1" /> Due:{" "}
-                      {task.dueDate}
+                      {task.due_date}
                     </span>
                   </div>
                 </div>
