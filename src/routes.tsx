@@ -1,5 +1,4 @@
 // src/routes.tsx
-import React from "react";
 import { Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Login from "./pages/Login";
